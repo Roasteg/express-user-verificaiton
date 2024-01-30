@@ -4,7 +4,9 @@ import morgan from "morgan";
 import methodOverride from "method-override";
 import cors from "cors";
 import helmet from "helmet";
+import passport from "passport";
 import { AppDataSource } from "./config/datasource";
+import { AuthController } from "./modules/auth/controller/user.controller";
 
 const app = express();
 const router = express.Router();
@@ -24,10 +26,16 @@ app.use(
 );
 
 app.use(router);
+app.use(passport.initialize());
 
-AppDataSource.initialize().then(() => {
-    app.listen(portHttp, () => {
-        debug(`listening on port ${portHttp}`);
+router.use("/auth", AuthController.router);
+
+AppDataSource.initialize()
+    .then(() => {
+        app.listen(portHttp, () => {
+            debug(`listening on port ${portHttp}`);
+        });
+    })
+    .catch((_error) => {
+        debug(_error);
     });
-}).catch((error) => debug(error));
-

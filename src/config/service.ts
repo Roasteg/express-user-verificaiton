@@ -1,44 +1,66 @@
-import {
-    DeepPartial,
+import type {
+    DeleteResult,
     EntityTarget,
-    FindManyOptions,
     FindOneOptions,
+    FindOptionsWhere,
+    ObjectId,
     ObjectLiteral,
     Repository,
-    getRepository,
 } from "typeorm";
 import { AppDataSource } from "./datasource";
 
 export default class Service<T extends ObjectLiteral> {
-    protected _repository: Repository<T>;
+    // eslint-disable-next-line no-restricted-syntax
+    private repository: Repository<T>;
 
     constructor(entity: EntityTarget<T>) {
-        if (!this._repository) {
-            this._repository = AppDataSource.getRepository(entity);
-        }
+        this.repository = AppDataSource.getRepository(entity);
     }
 
-    get repository() {
-        return this._repository;
+    protected async save(instance: T): Promise<T> {
+        return this.repository.save(instance);
     }
 
-    async save(instance: T) {
-        return await this._repository.save(instance);
+    protected async find({ conditions }: { conditions?: T | undefined }): Promise<T[]> {
+        return this.repository.find(conditions);
     }
 
-    async find(conditions?: T | undefined) {
-        return await this._repository.find(conditions);
+    protected async findOne(options: FindOneOptions<T>): Promise<T | null> {
+        return this.repository.findOne(options);
     }
 
-    async findOneOrFail(conditions: T) {
-        return await this._repository.findOneOrFail(conditions);
+    protected async findOneOrFail(conditions: FindOneOptions<T>): Promise<T> {
+        return this.repository.findOneOrFail(conditions);
     }
 
-    async update(criteria: any, partialInstance: T) {
-        return await this._repository.update(criteria, partialInstance);
+    protected async update(
+        criteria:
+            | string
+            | number
+            | string[]
+            | Date
+            | ObjectId
+            | number[]
+            | Date[]
+            | ObjectId[]
+            | FindOptionsWhere<T>,
+        partialInstance: Partial<T>
+    ): Promise<ObjectLiteral> {
+        return this.repository.update(criteria, partialInstance);
     }
 
-    async delete(params: any) {
-        return await this._repository.delete(params);
+    protected async delete(
+        params:
+            | string
+            | number
+            | string[]
+            | Date
+            | ObjectId
+            | FindOptionsWhere<T>
+            | number[]
+            | Date[]
+            | ObjectId[]
+    ): Promise<DeleteResult> {
+        return this.repository.delete(params);
     }
 }

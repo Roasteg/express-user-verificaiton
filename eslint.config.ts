@@ -1,5 +1,4 @@
 import sheriff from "eslint-config-sheriff";
-import { defineFlatConfig } from "eslint-define-config";
 
 const sheriffOptions = {
     react: false,
@@ -13,8 +12,11 @@ const sheriffOptions = {
 export default [
     ...sheriff(sheriffOptions),
     {
-      rules: {
-        "@typescript-eslint/no-unsafe-call": "off"
-      }
+        rules: {
+            "@typescript-eslint/no-unsafe-call": "off",
+            "@typescript-eslint/naming-convention": "off",
+            "import/no-named-as-default": "off",
+            "fp/no-class": "off",
+        },
     },
 ];

@@ -1,16 +1,38 @@
 {
-  "compilerOptions": {
-    "module": "CommonJS",
-    "esModuleInterop": true,
-    "lib": ["es6"],
-    "target": "ES2022",
-    "moduleResolution": "Node",
-    "sourceMap": true,
-    "outDir": "dist",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "typeRoots": ["./types"],
-    "strictNullChecks": true,
-    
-  },
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS",
+            "baseUrl": "./",
+            "paths": {
+                "@/*": ["src/*"]
+            },
+            "esModuleInterop": true,
+            "lib": ["ES2022"],
+            "target": "ES2022",
+            "moduleResolution": "Node",
+            "sourceMap": true,
+            "outDir": "dist",
+            "experimentalDecorators": true,
+            "emitDecoratorMetadata": true,
+            "typeRoots": ["./types"],
+            "strictNullChecks": true
+        }
+    },
+    "compilerOptions": {
+        "module": "CommonJS",
+        "baseUrl": "./",
+        "paths": {
+            "@/*": ["src/*"]
+        },
+        "esModuleInterop": true,
+        "lib": ["ES2022"],
+        "target": "ES2022",
+        "moduleResolution": "Node",
+        "sourceMap": true,
+        "outDir": "dist",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "typeRoots": ["./types"],
+        "strictNullChecks": true
+    }
 }
