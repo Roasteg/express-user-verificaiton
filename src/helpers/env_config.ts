@@ -1,4 +1,4 @@
-import { error } from "console";
+import { debug, error } from "console";
 import path from "path";
 import dotenv from "dotenv"; 
 
@@ -10,6 +10,7 @@ export default function getEnvConfig(): void {
             "..",
             `.env.${process.env.NODE_ENV}`
         );
+        debug(process.env.NODE_ENV)
 
         dotenv.config({ path: filePath });
     } catch (_error) {

@@ -67,7 +67,7 @@ export default class UserService extends Service<User> {
         return user;
     }
 
-    private async getUserByEmail(email: string): Promise<User | null> {
+    async getUserByEmail(email: string): Promise<User | null> {
         const user = await this.findOne({ where: { email } });
 
         return user;
