@@ -1,3 +1,4 @@
+import { debug } from "console";
 import _passport, { type PassportStatic, type DoneCallback } from "passport";
 import {
     Strategy,
@@ -7,7 +8,6 @@ import {
 import type { JwtPayload } from "jsonwebtoken";
 import getEnvConfig from "../helpers/env_config";
 import UserService from "../modules/auth/service/user.service";
-import { debug } from "console";
 
 getEnvConfig();
 const passport: PassportStatic = _passport;
@@ -21,10 +21,10 @@ const opts: StrategyOptionsWithoutRequest = {
 passport.use(
     new Strategy(opts, (jwtPayload: JwtPayload, done: DoneCallback): void => {
         const userService = new UserService();
+
         userService
-            .getUserByEmail(jwtPayload.username ?? "")
+            .getUserByEmail(jwtPayload.username as string)
             .then((user) => {
-                debug("USER YES!")
                 done(null, user);
             })
             .catch((_error) => {
@@ -35,4 +35,3 @@ passport.use(
 );
 
 export const authenticateJwt = passport.authenticate("jwt", { session: false });
-

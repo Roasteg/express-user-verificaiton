@@ -4,6 +4,7 @@ import type CreateUserDTO from "../dto/create_user.dto";
 import User from "../model/user";
 import UserDTO from "../dto/user.dto";
 import type LoginUserDTO from "../dto/login_user.dto";
+import WrongCredentialsError from "../exception/wrong_credentials.exception";
 import Service from "@/config/service";
 import getEnvConfig from "@/helpers/env_config";
 
@@ -25,7 +26,7 @@ export default class UserService extends Service<User> {
             throw new Error("Email already in use!");
         }
 
-        const passwordHash = md5(createUserDTO.password);
+        const passwordHash = this.generatePasswordHash(createUserDTO.password);
         const token = this.generateToken(createUserDTO.email);
 
         const user = await this.save({
@@ -43,8 +44,8 @@ export default class UserService extends Service<User> {
     async loginUser(loginUserDTO: LoginUserDTO): Promise<UserDTO> {
         const user = await this.getUserByEmail(loginUserDTO.email);
 
-        if (user === null || md5(loginUserDTO.password) !== user.hash) {
-            throw new Error("Wrong email/password!");
+        if (user === null || this.generatePasswordHash(loginUserDTO.password) !== user.hash) {
+            throw new WrongCredentialsError();
         }
 
         const token = this.generateToken(loginUserDTO.email);
@@ -73,7 +74,11 @@ export default class UserService extends Service<User> {
         return user;
     }
 
-    private generateToken(email: string): string {
+    generatePasswordHash(password: string): string {
+        return md5(password) as string;
+    }
+
+    generateToken(email: string): string {
         return jwt.sign(
             {
                 username: email,

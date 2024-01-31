@@ -16,7 +16,6 @@ const logger = morgan("common");
 
 getEnvConfig();
 
-
 app.use(helmet());
 app.use(express.json());
 app.use(logger);

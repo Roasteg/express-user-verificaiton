@@ -17,6 +17,10 @@ export default [
             "@typescript-eslint/naming-convention": "off",
             "import/no-named-as-default": "off",
             "fp/no-class": "off",
+            "@typescript-eslint/no-misused-promises": [
+                "error",
+                { checksVoidReturn: false },
+            ],
         },
     },
 ];

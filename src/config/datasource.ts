@@ -1,4 +1,4 @@
-import { Code, DataSource } from "typeorm";
+import { DataSource } from "typeorm";
 import getEnvConfig from "../helpers/env_config";
 import User from "@/modules/auth/model/user";
 
