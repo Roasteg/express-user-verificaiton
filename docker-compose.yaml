@@ -1,0 +1,23 @@
+version: '3.0'
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=test-user
+      - POSTGRES_PASSWORD=test-password
+      - POSTGRES_HOST=localhost
+      - POSTGRES_DB=oauth
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app/
+    depends_on:
+      - postgres
+

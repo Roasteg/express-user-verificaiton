@@ -24,4 +24,10 @@ export default class User {
     @Column({type: "boolean"})
     isGoogleLogin: boolean;
 
+    @Column({type: "boolean", default: false})
+    isActive?: boolean;
+
+    @Column({type: "boolean", default: false})
+    isBanned?: boolean;
+
 }

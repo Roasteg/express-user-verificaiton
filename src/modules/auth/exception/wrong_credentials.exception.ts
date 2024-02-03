@@ -1,9 +1,7 @@
-export default class WrongCredentialsError extends Error {
-    status: number;
-    constructor() {
-        super();
-        this.message = "Wrong email/password!"
-        this.status = 401;
-    }
+import ServerError from "@/common/core/server_error";
 
+export default class WrongCredentialsError extends ServerError {
+  constructor() {
+    super(401, "Wrong email/password");
+  }
 }
