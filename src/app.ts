@@ -33,7 +33,7 @@ app.use(router);
 app.use(passport.initialize());
 
 router.use("/auth", AuthController.router);
-router.use("/otp");
+router.use("/otp", AuthController.router);
 
 app.use((err, req, res, next) => {
   if (err instanceof ServerError) {

@@ -11,6 +11,7 @@ import { debug } from "console";
 import User from "../model/user";
 import SuccessResponse from "@/common/core/success_response";
 import ErrorResponse from "@/common/core/error_response";
+import userIsActive from "@/common/middleware/user_is_active.middleware";
 
 getEnvConfig();
 
@@ -44,7 +45,7 @@ authRouter.post("/login", async (req: LoginUserRequest, res: Response) => {
 
 authRouter.post(
   "/change-password",
-  [authenticateJwt],
+  [authenticateJwt, userIsActive],
   async (req: ChangePasswordRequest, res: Response) => {
     const service = new UserService();
     try {

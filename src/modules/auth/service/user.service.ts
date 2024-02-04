@@ -49,6 +49,8 @@ export default class UserService extends Service<User> {
       latestLogin: new Date(),
     });
 
+    await this.otpService.createOTP(user);
+
     return UserDTO.fromEntity(user);
   }
 
