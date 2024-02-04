@@ -14,14 +14,18 @@ import ServerError from "@/common/core/server_error";
 import UserNotProvidedError from "../exception/user_not_provided.exception";
 import WrongOldPasswordError from "../exception/wrong_old_password.exception";
 import InvalidTokenError from "../exception/invalid_token.exception";
+import OTPService from "@/modules/otp/service/otp.service";
+import VerifyOTPDTO from "@/modules/otp/dto/verify_otp.dto";
 
 getEnvConfig();
 const jwtSecret = process.env.JWT_SECRET;
 const jwtExpiration = process.env.JWT_EXPIRATION;
 
 export default class UserService extends Service<User> {
+  private otpService: OTPService;
   constructor() {
     super(User);
+    this.otpService = new OTPService(this);
   }
 
   async registerUser(createUserDTO: CreateUserDTO): Promise<UserDTO> {
@@ -91,6 +95,11 @@ export default class UserService extends Service<User> {
       throw new PasswordsNotMatchingError();
     }
 
+    await this.otpService.verifyOTP(
+      new VerifyOTPDTO(changePasswordDTO.otp),
+      user
+    );
+
     await this.update(user!.id, {
       hash: newPassword,
     });
@@ -119,6 +128,12 @@ export default class UserService extends Service<User> {
     const user = await this.findOne({ where: { email } });
 
     return user;
+  }
+
+  async activateUser(user: User): Promise<void> {
+    await this.update(user.id, {
+      isActive: true,
+    });
   }
 
   generatePasswordHash(password: string): string {

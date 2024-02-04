@@ -33,6 +33,7 @@ app.use(router);
 app.use(passport.initialize());
 
 router.use("/auth", AuthController.router);
+router.use("/otp");
 
 app.use((err, req, res, next) => {
   if (err instanceof ServerError) {
@@ -40,6 +41,7 @@ app.use((err, req, res, next) => {
   }
   return next(err);
 });
+
 AppDataSource.initialize()
   .then(() => {
     app.listen(portHttp, () => {

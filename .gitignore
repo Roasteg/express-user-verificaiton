@@ -1,5 +1,5 @@
 node_modules
 .vscode
 yarn.lock
-*.log  
+*.log
 postgres-data
