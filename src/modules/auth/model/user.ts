@@ -29,4 +29,5 @@ export default class User {
 
   @Column({ type: "boolean", default: false })
   isBanned?: boolean;
+
 }

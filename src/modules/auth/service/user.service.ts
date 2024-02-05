@@ -5,15 +5,14 @@ import User from "../model/user";
 import UserDTO from "../dto/user.dto";
 import type LoginUserDTO from "../dto/login_user.dto";
 import WrongCredentialsError from "../exception/wrong_credentials.exception";
-import Service from "@/common/core/service";
-import getEnvConfig from "@/helpers/env_config";
 import PasswordsNotMatchingError from "../exception/passwords_not_matching.exception";
 import EmailInUseError from "../exception/email_in_use.exception";
-import ChangePasswordDTO from "../dto/change_password.dto";
-import ServerError from "@/common/core/server_error";
+import type ChangePasswordDTO from "../dto/change_password.dto";
 import UserNotProvidedError from "../exception/user_not_provided.exception";
 import WrongOldPasswordError from "../exception/wrong_old_password.exception";
 import InvalidTokenError from "../exception/invalid_token.exception";
+import getEnvConfig from "@/helpers/env_config";
+import Service from "@/common/core/service";
 import OTPService from "@/modules/otp/service/otp.service";
 import VerifyOTPDTO from "@/modules/otp/dto/verify_otp.dto";
 
@@ -22,7 +21,7 @@ const jwtSecret = process.env.JWT_SECRET;
 const jwtExpiration = process.env.JWT_EXPIRATION;
 
 export default class UserService extends Service<User> {
-  private otpService: OTPService;
+  private otpService: OTPService; 
   constructor() {
     super(User);
     this.otpService = new OTPService(this);
@@ -40,7 +39,7 @@ export default class UserService extends Service<User> {
     const passwordHash = this.generatePasswordHash(createUserDTO.password);
     const token = this.generateToken(createUserDTO.email);
 
-    const user = await this.save({
+    const user = await this.saveUser({
       email: createUserDTO.email,
       id: 0,
       isGoogleLogin: false,
@@ -49,7 +48,7 @@ export default class UserService extends Service<User> {
       latestLogin: new Date(),
     });
 
-    await this.otpService.createOTP(user);
+    await this.createOTP(user);
 
     return UserDTO.fromEntity(user);
   }
@@ -87,7 +86,7 @@ export default class UserService extends Service<User> {
     );
 
     if (
-      this.generatePasswordHash(changePasswordDTO.oldPassword) !== user!.hash
+      this.generatePasswordHash(changePasswordDTO.oldPassword) !== user.hash
     ) {
       throw new WrongOldPasswordError();
     }
@@ -102,7 +101,7 @@ export default class UserService extends Service<User> {
       user
     );
 
-    await this.update(user!.id, {
+    await this.update(user.id, {
       hash: newPassword,
     });
   }
@@ -117,9 +116,10 @@ export default class UserService extends Service<User> {
     return user;
   }
 
-  async getUserAndVerifyToken(email: string, token: string) {
+  async getUserAndVerifyToken(email: string, token: string): Promise<User> {
     const user = await this.getUserByEmail(email);
-    if (user === null || user?.latestAccessToken !== token) {
+
+    if (user === null || user.latestAccessToken !== token) {
       throw new InvalidTokenError();
     }
 
@@ -130,6 +130,16 @@ export default class UserService extends Service<User> {
     const user = await this.findOne({ where: { email } });
 
     return user;
+  }
+
+  async saveUser(user: User): Promise<User> {
+    const savedUser = await this.save(user);
+
+    return savedUser;
+  }
+
+  async createOTP(user: User): Promise<void> {
+    await this.otpService.createOTP(user);
   }
 
   async activateUser(user: User): Promise<void> {
