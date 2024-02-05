@@ -14,14 +14,15 @@ import InvalidTokenError from "../exception/invalid_token.exception";
 import getEnvConfig from "@/helpers/env_config";
 import Service from "@/common/core/service";
 import OTPService from "@/modules/otp/service/otp.service";
-import VerifyOTPDTO from "@/modules/otp/dto/verify_otp.dto";
+import VerifyOTPDTO from "@/modules/auth/dto/verify_otp.dto";
+import UserNotFoundError from "@/common/exception/user_not_found.exception";
 
 getEnvConfig();
 const jwtSecret = process.env.JWT_SECRET;
 const jwtExpiration = process.env.JWT_EXPIRATION;
 
 export default class UserService extends Service<User> {
-  private otpService: OTPService; 
+  private otpService: OTPService;
   constructor() {
     super(User);
     this.otpService = new OTPService(this);
@@ -96,13 +97,24 @@ export default class UserService extends Service<User> {
       throw new PasswordsNotMatchingError();
     }
 
-    await this.otpService.verifyOTP(
-      new VerifyOTPDTO(changePasswordDTO.otp),
-      user
-    );
+    await this.verifyOTP(changePasswordDTO.otp, user);
 
     await this.update(user.id, {
       hash: newPassword,
+    });
+  }
+
+  async activateUser(
+    verifyOTPDTO: VerifyOTPDTO,
+    user: User | undefined
+  ): Promise<void> {
+    if (user === undefined) {
+      throw new UserNotFoundError();
+    }
+
+    await this.verifyOTP(verifyOTPDTO.otp, user);
+    await this.update(user.id, {
+      isActive: true,
     });
   }
 
@@ -142,10 +154,12 @@ export default class UserService extends Service<User> {
     await this.otpService.createOTP(user);
   }
 
-  async activateUser(user: User): Promise<void> {
-    await this.update(user.id, {
-      isActive: true,
-    });
+  async verifyOTP(otp: string, user: User | undefined): Promise<void> {
+    if (user === undefined) {
+      throw new UserNotFoundError();
+    }
+
+    await this.otpService.verifyOTP(otp, user);
   }
 
   generatePasswordHash(password: string): string {

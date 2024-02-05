@@ -19,6 +19,9 @@ export default class OTP {
   @Column({ type: "varchar" })
   otp: string;
 
-  @Column({ type: "datetime", default: new Date(Date.now() + 5 * 60 * 1000) })
+  @Column({
+    type: "timestamptz",
+    default: new Date(Date.now() + 5 * 60 * 1000),
+  })
   expiresAt?: Date;
 }

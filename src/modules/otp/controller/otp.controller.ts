@@ -1,5 +1,5 @@
 import { Router, type Request, type Response } from "express";
-import VerifyOTPRequest from "../request/verify_otp.request";
+import VerifyOTPRequest from "../../auth/request/verify_otp.request";
 import OTPService from "../service/otp.service";
 import UserService from "@/modules/auth/service/user.service";
 import SuccessResponse from "@/common/core/success_response";
@@ -10,24 +10,6 @@ import User from "@/modules/auth/model/user";
 import Controller from "@/common/core/controller";
 
 const otpRouter = Router();
-
-otpRouter.post(
-  "/verify",
-  [authenticateJwt],
-  async (req: VerifyOTPRequest, res: Response) => {
-    const userService = new UserService();
-    const service = new OTPService(userService);
-    try {
-      await service.verifyOTP(req.body, req.user as User | undefined);
-      res.send(new SuccessResponse("OTP Verified!"));
-    } catch (error) {
-      const _error = getError(error);
-      res
-        .status(_error.status)
-        .send(new ErrorResponse(_error.message, _error.status));
-    }
-  }
-);
 
 otpRouter.post(
   "/send",

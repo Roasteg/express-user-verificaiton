@@ -12,6 +12,7 @@ import User from "../model/user";
 import SuccessResponse from "@/common/core/success_response";
 import ErrorResponse from "@/common/core/error_response";
 import userIsActive from "@/common/middleware/user_is_active.middleware";
+import VerifyOTPRequest from "../request/verify_otp.request";
 
 getEnvConfig();
 
@@ -51,6 +52,23 @@ authRouter.post(
     try {
       await service.changePassword(req.body, req.user as User | undefined);
       res.send(new SuccessResponse("Password changed!"));
+    } catch (error) {
+      const _error = getError(error);
+      res
+        .status(_error.status)
+        .send(new ErrorResponse(_error.message, _error.status));
+    }
+  }
+);
+
+authRouter.post(
+  "/activate-user",
+  [authenticateJwt],
+  async (req: VerifyOTPRequest, res: Response) => {
+    const service = new UserService();
+    try {
+      await service.activateUser(req.body, req.user as User | undefined);
+      res.send(new SuccessResponse("User activated!"));
     } catch (error) {
       const _error = getError(error);
       res

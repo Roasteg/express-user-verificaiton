@@ -9,6 +9,7 @@ import { AppDataSource } from "./config/datasource.config";
 import { AuthController } from "./modules/auth/controller/user.controller";
 import getEnvConfig from "./helpers/env_config";
 import ServerError from "./common/core/server_error";
+import OTPController from "./modules/otp/controller/otp.controller";
 
 const app = express();
 const router = express.Router();
@@ -33,7 +34,7 @@ app.use(router);
 app.use(passport.initialize());
 
 router.use("/auth", AuthController.router);
-router.use("/otp", AuthController.router);
+router.use("/otp", OTPController.router);
 
 app.use((err, req, res, next) => {
   if (err instanceof ServerError) {
