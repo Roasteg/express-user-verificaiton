@@ -11,6 +11,7 @@ import sendMail from "@/common/core/send_mail";
 import { debug } from "console";
 import OTPNotFoundError from "../exception/otp_not_found.exception";
 import OTPExpiredError from "../exception/otp_expired.exception";
+import SendOTPDTO from "../dto/send_otp.dto";
 
 export default class OTPService extends Service<OTP> {
   private userService: UserService;
@@ -20,8 +21,10 @@ export default class OTPService extends Service<OTP> {
     this.userService = userService;
   }
 
-  async createOTP(user: User | undefined): Promise<void> {
-    if (user === undefined) {
+  async createOTP(sendOTPDTO: SendOTPDTO): Promise<void> {
+    const user = await this.userService.getUserByEmail(sendOTPDTO.email);
+
+    if(!user) {
       throw new UserNotFoundError();
     }
 
@@ -47,13 +50,15 @@ export default class OTPService extends Service<OTP> {
 
   async verifyOTP(otp: string, user: User): Promise<void> {
     const otpForUser = await this.getOTPForUser(user);
-    const currentDate = new Date(Date.now());
+    const currentDate = new Date();
 
     if (otpForUser === null) {
       throw new OTPNotFoundError();
     }
 
-    if (currentDate > otpForUser.expiresAt!) {
+    const expirtationDate = new Date(otpForUser.expiresAt!);
+
+    if (currentDate > expirtationDate) {
       throw new OTPExpiredError();
     }
 

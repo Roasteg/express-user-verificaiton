@@ -16,6 +16,8 @@ import Service from "@/common/core/service";
 import OTPService from "@/modules/otp/service/otp.service";
 import VerifyOTPDTO from "@/modules/auth/dto/verify_otp.dto";
 import UserNotFoundError from "@/common/exception/user_not_found.exception";
+import UserAlreadyActivatedError from "../exception/user_already_activated.exception";
+import SendOTPDTO from "@/modules/otp/dto/send_otp.dto";
 
 getEnvConfig();
 const jwtSecret = process.env.JWT_SECRET;
@@ -49,7 +51,7 @@ export default class UserService extends Service<User> {
       latestLogin: new Date(),
     });
 
-    await this.createOTP(user);
+    await this.createOTP(user.email);
 
     return UserDTO.fromEntity(user);
   }
@@ -112,6 +114,10 @@ export default class UserService extends Service<User> {
       throw new UserNotFoundError();
     }
 
+    if(user.isActive) { 
+      throw new UserAlreadyActivatedError();
+    }
+
     await this.verifyOTP(verifyOTPDTO.otp, user);
     await this.update(user.id, {
       isActive: true,
@@ -150,8 +156,8 @@ export default class UserService extends Service<User> {
     return savedUser;
   }
 
-  async createOTP(user: User): Promise<void> {
-    await this.otpService.createOTP(user);
+  async createOTP(email: string): Promise<void> {
+    await this.otpService.createOTP(new SendOTPDTO(email));
   }
 
   async verifyOTP(otp: string, user: User | undefined): Promise<void> {

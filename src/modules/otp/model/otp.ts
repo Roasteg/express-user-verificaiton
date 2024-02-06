@@ -20,7 +20,7 @@ export default class OTP {
   otp: string;
 
   @Column({
-    type: "timestamptz",
+    type: "timestamp with time zone",
     default: new Date(Date.now() + 5 * 60 * 1000),
   })
   expiresAt?: Date;

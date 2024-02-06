@@ -5,20 +5,20 @@ import UserService from "@/modules/auth/service/user.service";
 import SuccessResponse from "@/common/core/success_response";
 import getError from "@/common/helpers/get_error";
 import ErrorResponse from "@/common/core/error_response";
-import { authenticateJwt } from "@/config/passport.config";
 import User from "@/modules/auth/model/user";
 import Controller from "@/common/core/controller";
+import SendOTPRequest from "../requets/send_otp.request";
 
 const otpRouter = Router();
 
 otpRouter.post(
   "/send",
-  [authenticateJwt],
-  async (req: Request, res: Response) => {
+  async (req: SendOTPRequest, res: Response) => {
+
     const userService = new UserService();
     const service = new OTPService(userService);
     try {
-      await service.createOTP(req.user as User | undefined);
+      await service.createOTP(req.body);
       res.send(new SuccessResponse("OTP sent!"));
     } catch (error) {
       const _error = getError(error);
